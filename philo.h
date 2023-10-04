@@ -26,8 +26,8 @@ typedef struct s_philo
     int     nbr_meals;
     int     flag_death;
     pthread_t           thread_philo;
-    unsigned long int   time_begin;
-    unsigned long int   last_meal;
+    long long int   time_ms;
+    long long int   last_meal;
     pthread_mutex_t     m_fork;
     struct s_args       *args;
 }   t_philo;
@@ -36,25 +36,23 @@ typedef struct  s_args
 {
     int nbr_philo;
     t_philo *l_philos;
-    //int *thread_philo;
-    //int *num_philo;
-    //int *num_fork;
     int time_to_die;
     int time_to_eat;
     int time_to_sleep;
     int nbr_meal;
+    int id_t_check_death;
+    pthread_t   t_check_death;
 
-    unsigned long int start_time;
-    unsigned long int end_time;
-    struct timeval tv;
+    long long int start_time;
+    long long int end_time;
 }   t_args;
 
 void    *routine(void *data);
 int	    ft_atoi(const char *nptr);
 void	error_msg(char *msg);
-void    get_time(t_args *args);
+long long int    get_time();
 void	event_msg(t_args *args, int i);
-void    check_death(t_args *args);
+int    check_death(t_args *args);
 void    ft_free(t_args *args);
 
 #endif

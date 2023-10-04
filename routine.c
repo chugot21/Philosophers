@@ -16,7 +16,16 @@ void *routine(void *data)
 {
     t_philo *philo;
 
+    printf("test routine\n");
     philo = (t_philo *) data;
-    printf("I'm the philosopher number %d !\n", philo->num_philo);
+    //check_death(philo);
+
+    while (42)
+    {
+        printf("I'm the philosopher number %d !\n", philo->num_philo);
+        usleep(100000);
+        //usleep(philo->args->time_to_eat * 1000);
+        //usleep(philo->args->time_to_eat * 1000);
+    }
     return (0);
 }

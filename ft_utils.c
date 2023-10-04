@@ -44,10 +44,13 @@ void	error_msg(char *msg)
 	exit(1);
 }
 
-void    get_time(t_args *args)
+long long int    get_time()
 {
-    gettimeofday(&args->tv, NULL);
-    args->end_time = (args->tv.tv_sec * 1000 + (args->tv.tv_usec / 1000)) - args->start_time;
+	struct timeval clock;
+
+    if (gettimeofday(&clock, NULL) != 0)
+        error_msg("Error gettimeofday start\n");
+    return (clock.tv_sec * 1000 + (clock.tv_usec / 1000));
 }
 
 void    ft_free(t_args *args)
@@ -63,42 +66,56 @@ void    ft_free(t_args *args)
     free(args->l_philos);
 }
 
-void    check_death(t_args *args)
+int    check_death(t_args *args)
 {
     int i;
 
-    i = 0;
-    while (i < args->nbr_philo)
-    {
-        gettimeofday(&args->tv, NULL);
-		if (args->l_philos[i].last_meal == 0)
-		{
-			args->l_philos[i].last_meal = (args->tv.tv_sec * 1000 + (args->tv.tv_usec / 1000)) - args->start_time;
-		}
-		else
-        	args->l_philos[i].last_meal = (args->tv.tv_sec * 1000 + (args->tv.tv_usec / 1000)) - args->l_philos[i].last_meal;
-        if (args->l_philos[i].last_meal > args->time_to_die)
-        {
-			args->l_philos[i].flag_death = 1;
-			event_msg(args, i);
-            ft_free(args);
-        }
-        i++;
-    }
+	while (21)
+	{
+		printf("\ncheck death\n");
+		usleep(10000);
+		i = 0;
+    	while (i < args->nbr_philo)
+    	{
+			if (args->l_philos[i].nbr_meals == 0)
+			{
+				printf("test\n");
+    	    	args->l_philos[i].last_meal = get_time() - args->start_time;
+				//printf("test last meal : %lld\n", args->l_philos[i].last_meal);
+			}
+			else
+			{
+				printf("test2\n");
+				args->l_philos[i].last_meal = get_time() - args->l_philos[i].last_meal - args->start_time;
+			}
+    	    if (args->l_philos[i].last_meal > args->time_to_die)
+    	    {
+				args->l_philos[i].flag_death = 1;
+				args->l_philos[i].time_ms = get_time() - args->start_time;
+				printf("%lld ms, n*%d is died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
+				//event_msg(args, i);
+    	        //ft_free(args);
+				return (1);
+    	    }
+    	    i++;
+    	}
+	}
 }
 
-void	event_msg(t_args *args, int i)
+/*void	event_msg(t_args *args, int i)
 {
 	if (args->l_philos[i].flag_death == 1)
 	{
-		gettimeofday(&args->tv, NULL);
-		args->l_philos[i].time_begin = (args->tv.tv_sec * 1000 + (args->tv.tv_usec / 1000)) - args->start_time;
-		printf("%ld ms, n*%d is died\n", args->l_philos[i].time_begin, args->l_philos[i].num_philo);
-		if (i == args->nbr_philo)
-			exit(0);
+		args->l_philos[i].time_ms = get_time() - args->start_time;
+		printf("%lld ms, n*%d is died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
+		//if (i == (philo->args->nbr_philo - 1))
+		//{
+		ft_free(args);
+		exit(0);
+		//}
 	}
 	//if fork
 	//if eating
 	//if sleeping
 	//if thinking
-}
+}*/
