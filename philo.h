@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chugot <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: clara <clara@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 15:10:36 by chugot            #+#    #+#             */
-/*   Updated: 2023/08/07 15:10:37 by chugot           ###   ########.fr       */
+/*   Updated: 2023/10/08 20:03:30 by clara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,11 @@ typedef struct s_philo
 {
     int     num_philo;
     int     id_thread_philo;
-    int     mutex_fork;
     int     nbr_meals;
-    int     flag_death;
     pthread_t           thread_philo;
     long long int   time_ms;
     long long int   last_meal;
-    pthread_mutex_t     m_fork;
+    long long int   gap_meal;
     struct s_args       *args;
 }   t_philo;
 
@@ -40,9 +38,7 @@ typedef struct  s_args
     int time_to_eat;
     int time_to_sleep;
     int nbr_meal;
-    int id_t_check_death;
-    pthread_t   t_check_death;
-
+    pthread_mutex_t *forks;
     long long int start_time;
     long long int end_time;
 }   t_args;

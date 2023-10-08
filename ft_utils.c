@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_utils.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chugot <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: chugot <clara@student.42.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/17 13:51:16 by chugot            #+#    #+#             */
-/*   Updated: 2023/04/17 13:51:18 by chugot           ###   ########.fr       */
+/*   Created: 2023/09/26 13:51:16 by chugot            #+#    #+#             */
+/*   Updated: 2023/10/08 13:51:18 by clara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,62 +60,60 @@ void    ft_free(t_args *args)
     i = 0;
     while (i < args->nbr_philo)
     {
-        pthread_mutex_unlock(&args->l_philos[i].m_fork);
-        pthread_mutex_destroy(&args->l_philos[i].m_fork);
+        pthread_mutex_unlock(&args->forks[i]); //Revoir car fork dejà unlock.
+        pthread_mutex_destroy(&args->forks[i]);
     }
+	free(args->forks);
     free(args->l_philos);
 }
 
-int    check_death(t_args *args)
+int	check_nbr_meals(t_args *args)
+{
+	int i;
+
+	i = 0;
+	while (i < args->nbr_philo)
+	{
+		if (args->nbr_meal == args->l_philos[i].nbr_meals)
+			i++;
+		else
+			return (0);
+	}
+	return (1);
+}
+
+int    check_death(t_args *args) // Voir pour attendre les autres threads avant d'exit et les rendre muets.
 {
     int i;
 
 	while (21)
 	{
-		printf("\ncheck death\n");
 		usleep(10000);
 		i = 0;
     	while (i < args->nbr_philo)
     	{
-			if (args->l_philos[i].nbr_meals == 0)
-			{
-				printf("test\n");
-    	    	args->l_philos[i].last_meal = get_time() - args->start_time;
-				//printf("test last meal : %lld\n", args->l_philos[i].last_meal);
-			}
-			else
-			{
-				printf("test2\n");
-				args->l_philos[i].last_meal = get_time() - args->l_philos[i].last_meal - args->start_time;
-			}
-    	    if (args->l_philos[i].last_meal > args->time_to_die)
+			args->l_philos[i].gap_meal = 0;
+    	    args->l_philos[i].gap_meal = get_time() - args->l_philos[i].last_meal;
+    	    if (args->l_philos[i].gap_meal > args->time_to_die)
     	    {
-				args->l_philos[i].flag_death = 1;
 				args->l_philos[i].time_ms = get_time() - args->start_time;
-				printf("%lld ms, n*%d is died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
-				//event_msg(args, i);
-    	        //ft_free(args);
+				printf("%lld ms - n* %d is died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
 				return (1);
     	    }
+			if (args->nbr_meal == args->l_philos[i].nbr_meals)
+			{
+				if (check_nbr_meals(args) == 1)
+				{
+					args->l_philos[i].time_ms = get_time() - args->start_time;
+					printf("%lld ms - All philosophers are full\n", args->l_philos[i].time_ms);
+					return (2);
+				}
+			}
     	    i++;
     	}
 	}
 }
 
-/*void	event_msg(t_args *args, int i)
-{
-	if (args->l_philos[i].flag_death == 1)
-	{
-		args->l_philos[i].time_ms = get_time() - args->start_time;
-		printf("%lld ms, n*%d is died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
-		//if (i == (philo->args->nbr_philo - 1))
-		//{
-		ft_free(args);
-		exit(0);
-		//}
-	}
-	//if fork
-	//if eating
-	//if sleeping
-	//if thinking
-}*/
+//Voir pour attendre les autres threads avant d'exit et les rendre muets.
+//Revoir les free des fork  car peuvent etre dejà unlock.
+//Revoir premiers philo qui mangent. Il n'y en a qu'un qui mange au debut si 4 philo, bizarre...
