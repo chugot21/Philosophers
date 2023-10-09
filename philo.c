@@ -6,7 +6,7 @@
 /*   By: clara <clara@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 15:09:06 by chugot            #+#    #+#             */
-/*   Updated: 2023/10/08 20:40:08 by clara            ###   ########.fr       */
+/*   Updated: 2023/10/09 18:07:39 by clara            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ void create_threads(t_args *args)
     while (i <= args->nbr_philo)
     {
         create_tab_threads(args, i);
-        printf("i : %d\n", i);
         i++;
     }  
 }
@@ -57,7 +56,7 @@ void    only_one_fork(t_args *args)
     {
         usleep(args->time_to_die * 1000);
         args->end_time = get_time() - args->start_time;
-        printf("%lld ms, n*1 died\n", args->end_time);
+        printf("%lld ms - 1 died\n", args->end_time);
         exit(0);
     }
 }
@@ -119,11 +118,9 @@ int main(int argc, char **argv)
     only_one_fork(&args);
     create_threads(&args);
     unlock_mutex(&args);
-    if (check_death(&args) == 1 || check_death(&args) == 2)
+    if (check_death(&args) == 1)
     {
         ft_free(&args);
         exit(0);
     }
-    //free dedans.
-    //check nbr repas.
 }

@@ -57,11 +57,12 @@ void    ft_free(t_args *args)
 {
     int i;
 
-    i = 0;
+	i = 0;
     while (i < args->nbr_philo)
     {
         pthread_mutex_unlock(&args->forks[i]); //Revoir car fork dejà unlock.
         pthread_mutex_destroy(&args->forks[i]);
+		i++;
     }
 	free(args->forks);
     free(args->l_philos);
@@ -88,7 +89,7 @@ int    check_death(t_args *args) // Voir pour attendre les autres threads avant 
 
 	while (21)
 	{
-		usleep(10000);
+		//usleep(100);
 		i = 0;
     	while (i < args->nbr_philo)
     	{
@@ -97,7 +98,8 @@ int    check_death(t_args *args) // Voir pour attendre les autres threads avant 
     	    if (args->l_philos[i].gap_meal > args->time_to_die)
     	    {
 				args->l_philos[i].time_ms = get_time() - args->start_time;
-				printf("%lld ms - n* %d is died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
+				usleep(1000);
+				printf("%lld ms - %d is died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
 				return (1);
     	    }
 			if (args->nbr_meal == args->l_philos[i].nbr_meals)
@@ -105,8 +107,9 @@ int    check_death(t_args *args) // Voir pour attendre les autres threads avant 
 				if (check_nbr_meals(args) == 1)
 				{
 					args->l_philos[i].time_ms = get_time() - args->start_time;
+					usleep(1000);
 					printf("%lld ms - All philosophers are full\n", args->l_philos[i].time_ms);
-					return (2);
+					return (1);
 				}
 			}
     	    i++;
@@ -114,6 +117,6 @@ int    check_death(t_args *args) // Voir pour attendre les autres threads avant 
 	}
 }
 
-//Voir pour attendre les autres threads avant d'exit et les rendre muets.
-//Revoir les free des fork  car peuvent etre dejà unlock.
-//Revoir premiers philo qui mangent. Il n'y en a qu'un qui mange au debut si 4 philo, bizarre...
+// Revoir les free des fork  car peuvent etre dejà unlock.
+// Voir pour rajouter un mutex pour empecher que les philo volent des forks s'ils meurent.
+// Voir si plus de 100 philos -> y en a qui meurent...
