@@ -37,6 +37,7 @@ void create_threads(t_args *args)
     int i;
 
     i = 1;
+    pthread_mutex_init(&args->mutex_death, NULL);
     args->forks = malloc(sizeof(pthread_mutex_t) * (args->nbr_philo) + 1);
     if (!args->forks)
         error_msg("Error malloc\n");
@@ -101,20 +102,30 @@ void    unlock_mutex(t_args *args)
     }
 }
 
+void init_struct(int argc, char **argv, t_args *args)
+{
+    args->nbr_philo = ft_atoi(argv[1]);
+    if (args->nbr_philo > 200)
+    {
+        printf("Error too many philosophers\n");
+        exit(1);
+    }
+    args->time_to_die = ft_atoi(argv[2]);
+    args->time_to_eat = ft_atoi(argv[3]);
+    args->time_to_sleep = ft_atoi(argv[4]);
+    if (argc == 6)
+        args->nbr_meal = ft_atoi(argv[5]);
+    else
+        args->nbr_meal = -1;
+    args->start_time = get_time();
+}
+
 int main(int argc, char **argv)
 {
     t_args  args;
 
     check_errors(argc, argv);
-    args.nbr_philo = ft_atoi(argv[1]);
-    args.time_to_die = ft_atoi(argv[2]);
-    args.time_to_eat = ft_atoi(argv[3]);
-    args.time_to_sleep = ft_atoi(argv[4]);
-    if (argc == 6)
-        args.nbr_meal = ft_atoi(argv[5]);
-    else
-        args.nbr_meal = -1;
-    args.start_time = get_time();
+    init_struct(argc, argv, &args);
     only_one_fork(&args);
     create_threads(&args);
     unlock_mutex(&args);

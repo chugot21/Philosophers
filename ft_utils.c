@@ -58,12 +58,20 @@ void    ft_free(t_args *args)
     int i;
 
 	i = 0;
+	//while (i < args->nbr_philo)
+	//{
+	//	pthread_join(args->l_philos[i].thread_philo, 0);
+	//	i++;
+	//}
+	//i = 0;
     while (i < args->nbr_philo)
     {
         pthread_mutex_unlock(&args->forks[i]); //Revoir car fork dejà unlock.
         pthread_mutex_destroy(&args->forks[i]);
 		i++;
     }
+	pthread_mutex_unlock(&args->mutex_death);
+	pthread_mutex_destroy(&args->mutex_death);
 	free(args->forks);
     free(args->l_philos);
 }
@@ -83,7 +91,7 @@ int	check_nbr_meals(t_args *args)
 	return (1);
 }
 
-int    check_death(t_args *args) // Voir pour attendre les autres threads avant d'exit et les rendre muets.
+int    check_death(t_args *args) 
 {
     int i;
 
@@ -91,6 +99,7 @@ int    check_death(t_args *args) // Voir pour attendre les autres threads avant 
 	{
 		//usleep(100);
 		i = 0;
+		pthread_mutex_lock(&args->mutex_death);
     	while (i < args->nbr_philo)
     	{
 			args->l_philos[i].gap_meal = 0;
@@ -114,9 +123,11 @@ int    check_death(t_args *args) // Voir pour attendre les autres threads avant 
 			}
     	    i++;
     	}
+		pthread_mutex_unlock(&args->mutex_death);
 	}
 }
 
-// Revoir les free des fork  car peuvent etre dejà unlock.
-// Voir pour rajouter un mutex pour empecher que les philo volent des forks s'ils meurent.
-// Voir si plus de 100 philos -> y en a qui meurent...
+// Test 4 310 200 100. One philosopher should die.
+// Voir pour rajouter un mutex pour empecher que les philos volent des forks s'ils meurent -> voir si ok ? juste fork a free si pendant repas d'un autre. ./philo 4 310 200 100
+//-> verif si un meurt et qu'un autre a les fork -> Revoir les free/unlock des fork  car peuvent etre lock.
+// Voir pour attendre les autres threads avant d'exit ?

@@ -41,6 +41,7 @@ typedef struct  s_args
     pthread_mutex_t *forks;
     long long int start_time;
     long long int end_time;
+    pthread_mutex_t mutex_death;
 }   t_args;
 
 void    *routine(void *data);

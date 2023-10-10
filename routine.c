@@ -14,6 +14,7 @@
 
 void    routine_eating(t_philo *philo)
 {
+    pthread_mutex_lock(&philo->args->mutex_death);
     if (philo->num_philo == philo->args->nbr_philo)
     {
         pthread_mutex_lock(&philo->args->forks[philo->num_philo - 1]);
@@ -21,13 +22,14 @@ void    routine_eating(t_philo *philo)
     }
     else
     {
-        pthread_mutex_lock(&philo->args->forks[philo->num_philo]);
         pthread_mutex_lock(&philo->args->forks[philo->num_philo - 1]);
+        pthread_mutex_lock(&philo->args->forks[philo->num_philo]);
     }
     philo->time_ms = get_time() - philo->args->start_time;
     printf("%lld ms - %d has taken a fork\n%lld ms - %d has taken a fork\n", philo->time_ms, philo->num_philo, philo->time_ms, philo->num_philo);
     philo->time_ms = get_time() - philo->args->start_time;
     printf("%lld ms - %d is eating\n", philo->time_ms, philo->num_philo);
+    pthread_mutex_unlock(&philo->args->mutex_death);
     philo->last_meal = get_time();
     usleep(philo->args->time_to_eat * 1000);
     philo->nbr_meals++;
@@ -39,7 +41,6 @@ void *routine(void *data)
     t_philo *philo;
 
     philo = (t_philo *) data;
-
     if (philo->num_philo % 2 == 0)
         usleep(5000);
     while (42)
