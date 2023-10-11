@@ -38,18 +38,11 @@ int	ft_atoi(const char *nptr)
 	return (num * sign);
 }
 
-void	error_msg(char *msg)
-{
-	perror(msg);
-	exit(1);
-}
-
 long long int    get_time()
 {
 	struct timeval clock;
 
-    if (gettimeofday(&clock, NULL) != 0)
-        error_msg("Error gettimeofday start\n");
+    gettimeofday(&clock, NULL);
     return (clock.tv_sec * 1000 + (clock.tv_usec / 1000));
 }
 
@@ -58,18 +51,18 @@ void    ft_free(t_args *args)
     int i;
 
 	i = 0;
-	//while (i < args->nbr_philo)
-	//{
-	//	pthread_join(args->l_philos[i].thread_philo, 0);
-	//	i++;
-	//}
-	//i = 0;
     while (i < args->nbr_philo)
     {
-        pthread_mutex_unlock(&args->forks[i]); //Revoir car fork dejà unlock.
+        pthread_mutex_unlock(&args->forks[i]);
         pthread_mutex_destroy(&args->forks[i]);
 		i++;
     }
+	i = 0;
+	while (i < args->nbr_philo)
+	{
+		pthread_join(args->l_philos[i].thread_philo, 0);
+		i++;
+	}
 	pthread_mutex_unlock(&args->mutex_death);
 	pthread_mutex_destroy(&args->mutex_death);
 	free(args->forks);
@@ -94,12 +87,13 @@ int	check_nbr_meals(t_args *args)
 int    check_death(t_args *args) 
 {
     int i;
+	int j;
 
+	j = 0;
 	while (21)
 	{
-		//usleep(100);
 		i = 0;
-		pthread_mutex_lock(&args->mutex_death);
+		//pthread_mutex_lock(&args->mutex_death);
     	while (i < args->nbr_philo)
     	{
 			args->l_philos[i].gap_meal = 0;
@@ -108,8 +102,13 @@ int    check_death(t_args *args)
     	    {
 				args->l_philos[i].time_ms = get_time() - args->start_time;
 				usleep(1000);
-				printf("%lld ms - %d is died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
-				return (1);
+				printf("%lld ms - %d died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
+				while(j < args->nbr_philo)
+				{
+					args->l_philos[j].args->if_dead = 1;
+					j++;
+				}
+				return(1);
     	    }
 			if (args->nbr_meal == args->l_philos[i].nbr_meals)
 			{
@@ -118,16 +117,21 @@ int    check_death(t_args *args)
 					args->l_philos[i].time_ms = get_time() - args->start_time;
 					usleep(1000);
 					printf("%lld ms - All philosophers are full\n", args->l_philos[i].time_ms);
-					return (1);
+					while(j < args->nbr_philo)
+					{
+						args->l_philos[j].args->if_dead = 1;
+						j++;
+					}
+					return(1);
 				}
 			}
     	    i++;
     	}
-		pthread_mutex_unlock(&args->mutex_death);
+		//pthread_mutex_unlock(&args->mutex_death);
 	}
 }
 
-// Test 4 310 200 100. One philosopher should die.
-// Voir pour rajouter un mutex pour empecher que les philos volent des forks s'ils meurent -> voir si ok ? juste fork a free si pendant repas d'un autre. ./philo 4 310 200 100
+// Test 4 310 200 100. One philosopher should die. -> bizarre...
+// Voir pour rajouter un mutex pour empecher que les philos volent des forks s'ils meurent -> voir si ok ? normalement ok. juste fork a free si pendant repas d'un autre. ./philo 4 310 200 100 un flag ?
 //-> verif si un meurt et qu'un autre a les fork -> Revoir les free/unlock des fork  car peuvent etre lock.
-// Voir pour attendre les autres threads avant d'exit ?
+//revoir fsanitize=thread

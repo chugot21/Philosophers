@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-void    create_tab_threads(t_args *args, int i)
+int    create_tab_threads(t_args *args, int i)
 {
     t_philo     philo;
     pthread_mutex_t m_fork;
@@ -29,10 +29,14 @@ void    create_tab_threads(t_args *args, int i)
     args->l_philos[i - 1].nbr_meals = 0;
     args->l_philos[i - 1].id_thread_philo = pthread_create(&args->l_philos[i - 1].thread_philo, NULL, routine, &args->l_philos[i - 1]);
     if (args->l_philos[i - 1].id_thread_philo != 0)
-        error_msg("Error thread\n");
+    {
+        printf("Error thread\n");
+        return (1);
+    }
+    return (0);
 }
 
-void create_threads(t_args *args)
+int create_threads(t_args *args)
 {
     int i;
 
@@ -40,29 +44,38 @@ void create_threads(t_args *args)
     pthread_mutex_init(&args->mutex_death, NULL);
     args->forks = malloc(sizeof(pthread_mutex_t) * (args->nbr_philo) + 1);
     if (!args->forks)
-        error_msg("Error malloc\n");
+    {
+        printf("Error malloc\n");
+        return (1);
+    }
     args->l_philos = malloc(sizeof(t_philo) * (args->nbr_philo) + 1);
     if (!args->l_philos)
-        error_msg("Error malloc\n");
+    {
+        printf("Error malloc\n");
+        return(1);
+    }
     while (i <= args->nbr_philo)
     {
-        create_tab_threads(args, i);
+        if (create_tab_threads(args, i) == 1)
+            return(1);
         i++;
-    }  
+    }
+    return(0);
 }
 
-void    only_one_fork(t_args *args)
+int    only_one_fork(t_args *args)
 {
     if (args->nbr_philo == 1)
     {
         usleep(args->time_to_die * 1000);
         args->end_time = get_time() - args->start_time;
         printf("%lld ms - 1 died\n", args->end_time);
-        exit(0);
+        return(1);
     }
+    return(0);
 }
 
-void    check_errors(int argc, char **argv)
+int    check_errors(int argc, char **argv)
 {
     int i;
     int j;
@@ -72,7 +85,7 @@ void    check_errors(int argc, char **argv)
     if (argc < 5 || argc > 6)
     {
         printf("Error number of arguments\n");
-        exit(1);
+        return(1);
     }
     while (i < argc)
     {
@@ -82,12 +95,13 @@ void    check_errors(int argc, char **argv)
             if (argv[i][j] < '0' || argv[i][j] > '9')
             {
                 printf("Error arguments are not numbers.\n");
-                exit(0);
+                return(1);
             }
             j++;
         }
         i++;
     }
+    return(0);
 }
 
 void    unlock_mutex(t_args *args)
@@ -102,13 +116,13 @@ void    unlock_mutex(t_args *args)
     }
 }
 
-void init_struct(int argc, char **argv, t_args *args)
+int init_struct(int argc, char **argv, t_args *args)
 {
     args->nbr_philo = ft_atoi(argv[1]);
     if (args->nbr_philo > 200)
     {
         printf("Error too many philosophers\n");
-        exit(1);
+        return(1);
     }
     args->time_to_die = ft_atoi(argv[2]);
     args->time_to_eat = ft_atoi(argv[3]);
@@ -118,20 +132,26 @@ void init_struct(int argc, char **argv, t_args *args)
     else
         args->nbr_meal = -1;
     args->start_time = get_time();
+    args->if_dead = -1;
+    return(0);
 }
 
 int main(int argc, char **argv)
 {
     t_args  args;
 
-    check_errors(argc, argv);
-    init_struct(argc, argv, &args);
-    only_one_fork(&args);
-    create_threads(&args);
+    if (check_errors(argc, argv) == 1)
+        return(1);
+    if (init_struct(argc, argv, &args) == 1)
+        return(1);
+    if (only_one_fork(&args) == 1)
+        return(1);
+    if (create_threads(&args) == 1)
+        return(1);
     unlock_mutex(&args);
     if (check_death(&args) == 1)
     {
         ft_free(&args);
-        exit(0);
+        return(0);
     }
 }

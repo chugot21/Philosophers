@@ -41,14 +41,14 @@ typedef struct  s_args
     pthread_mutex_t *forks;
     long long int start_time;
     long long int end_time;
+    int if_dead;
     pthread_mutex_t mutex_death;
 }   t_args;
 
 void    *routine(void *data);
 int	    ft_atoi(const char *nptr);
-void	error_msg(char *msg);
 long long int    get_time();
-void	event_msg(t_args *args, int i);
+//void	event_msg(t_args *args, int i);
 int    check_death(t_args *args);
 void    ft_free(t_args *args);
 

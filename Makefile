@@ -6,7 +6,7 @@
 #    By: clara <clara@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/07 12:00:49 by chugot            #+#    #+#              #
-#    Updated: 2023/08/07 17:48:26 by chugot           ###   ########.fr        #
+#    Updated: 2023/10/11 13:03:46 by chugot           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ SRCS =	philo.c \
 
 CC = cc
 
-FLAGS = -g -pthread -Wall -Wextra -Werror
+FLAGS = -g3 -pthread -Wall -Wextra -Werror -fsanitize=thread
 
 OBJS = $(SRCS:.c=.o)
 
