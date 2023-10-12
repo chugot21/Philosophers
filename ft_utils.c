@@ -51,20 +51,20 @@ void    ft_free(t_args *args)
     int i;
 
 	i = 0;
+	while (i < args->nbr_philo)
+	{
+		pthread_join(args->l_philos[i].thread_philo, 0);
+		i++;
+	}
+	i = 0;
     while (i < args->nbr_philo)
     {
         pthread_mutex_unlock(&args->forks[i]);
         pthread_mutex_destroy(&args->forks[i]);
 		i++;
     }
-	i = 0;
-	while (i < args->nbr_philo)
-	{
-		pthread_join(args->l_philos[i].thread_philo, 0);
-		i++;
-	}
-	pthread_mutex_unlock(&args->mutex_death);
-	pthread_mutex_destroy(&args->mutex_death);
+	//pthread_mutex_unlock(&args->mutex_death);
+	//pthread_mutex_destroy(&args->mutex_death);
 	free(args->forks);
     free(args->l_philos);
 }
@@ -134,4 +134,6 @@ int    check_death(t_args *args)
 // Test 4 310 200 100. One philosopher should die. -> bizarre...
 // Voir pour rajouter un mutex pour empecher que les philos volent des forks s'ils meurent -> voir si ok ? normalement ok. juste fork a free si pendant repas d'un autre. ./philo 4 310 200 100 un flag ?
 //-> verif si un meurt et qu'un autre a les fork -> Revoir les free/unlock des fork  car peuvent etre lock.
-//revoir fsanitize=thread
+//revoir fsanitize=thread ca deadline possibly lost
+//revoir pour philo nombre impair
+//revoir pour time to think si egale a zero ou moins de 10ms.

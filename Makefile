@@ -18,7 +18,7 @@ SRCS =	philo.c \
 
 CC = cc
 
-FLAGS = -g3 -pthread -Wall -Wextra -Werror -fsanitize=thread
+FLAGS = -g3 -pthread -Wall -Wextra -Werror
 
 OBJS = $(SRCS:.c=.o)
 
