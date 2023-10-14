@@ -20,36 +20,36 @@
 
 typedef struct s_philo
 {
-    int     num_philo;
-    int     id_thread_philo;
-    int     nbr_meals;
-    pthread_t           thread_philo;
-    long long int   time_ms;
-    long long int   last_meal;
-    long long int   gap_meal;
-    struct s_args       *args;
-}   t_philo;
+	int				num_philo;
+	int				id_thread_philo;
+	int				nbr_meals;
+	pthread_t		thread_philo;
+	long long int	time_ms;
+	long long int	last_meal;
+	long long int	gap_meal;
+	struct s_args	*args;
+}	t_philo;
 
-typedef struct  s_args
+typedef struct s_args
 {
-    int nbr_philo;
-    t_philo *l_philos;
-    int time_to_die;
-    int time_to_eat;
-    int time_to_sleep;
-    int nbr_meal;
-    pthread_mutex_t *forks;
-    long long int start_time;
-    long long int end_time;
-    int if_dead;
-    pthread_mutex_t mutex_death;
-}   t_args;
+	int				nbr_philo;
+	t_philo			*l_philos;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				nbr_meal;
+	pthread_mutex_t	*forks;
+	long long int	start_time;
+	long long int	end_time;
+	int				if_dead;
+	pthread_mutex_t	mutex_death;
+}	t_args;
 
-void    *routine(void *data);
-int	    ft_atoi(const char *nptr);
-long long int    get_time();
-//void	event_msg(t_args *args, int i);
-int    check_death(t_args *args);
-void    ft_free(t_args *args);
+int				create_threads(t_args *args);
+void			*routine(void *data);
+int				check_death(t_args *args);
+void			ft_free(t_args *args);
+int				ft_atoi(const char *nptr);
+long long int	get_time(void);
 
 #endif

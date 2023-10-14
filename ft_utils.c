@@ -13,7 +13,7 @@
 #include "philo.h"
 
 int	ft_atoi(const char *nptr)
-{	
+{
 	int	i;
 	int	sign;
 	int	num;
@@ -38,102 +38,30 @@ int	ft_atoi(const char *nptr)
 	return (num * sign);
 }
 
-long long int    get_time()
+long long int	get_time(void)
 {
-	struct timeval clock;
+	struct timeval	clock;
 
-    gettimeofday(&clock, NULL);
-    return (clock.tv_sec * 1000 + (clock.tv_usec / 1000));
+	gettimeofday (&clock, NULL);
+	return (clock.tv_sec * 1000 + (clock.tv_usec / 1000));
 }
 
-void    ft_free(t_args *args)
+void	ft_free(t_args *args)
 {
-    int i;
+	int	i;
 
 	i = 0;
 	while (i < args->nbr_philo)
 	{
-		pthread_join(args->l_philos[i].thread_philo, 0);
+		pthread_join(args->l_philos[i].thread_philo, NULL);
 		i++;
 	}
 	i = 0;
-    while (i < args->nbr_philo)
-    {
-        pthread_mutex_unlock(&args->forks[i]);
-        pthread_mutex_destroy(&args->forks[i]);
+	while (i < args->nbr_philo)
+	{
+		pthread_mutex_destroy(&args->forks[i]);
 		i++;
-    }
-	//pthread_mutex_unlock(&args->mutex_death);
-	//pthread_mutex_destroy(&args->mutex_death);
+	}
 	free(args->forks);
-    free(args->l_philos);
+	free(args->l_philos);
 }
-
-int	check_nbr_meals(t_args *args)
-{
-	int i;
-
-	i = 0;
-	while (i < args->nbr_philo)
-	{
-		if (args->nbr_meal == args->l_philos[i].nbr_meals)
-			i++;
-		else
-			return (0);
-	}
-	return (1);
-}
-
-int    check_death(t_args *args) 
-{
-    int i;
-	int j;
-
-	j = 0;
-	while (21)
-	{
-		i = 0;
-		//pthread_mutex_lock(&args->mutex_death);
-    	while (i < args->nbr_philo)
-    	{
-			args->l_philos[i].gap_meal = 0;
-    	    args->l_philos[i].gap_meal = get_time() - args->l_philos[i].last_meal;
-    	    if (args->l_philos[i].gap_meal > args->time_to_die)
-    	    {
-				args->l_philos[i].time_ms = get_time() - args->start_time;
-				usleep(1000);
-				printf("%lld ms - %d died\n", args->l_philos[i].time_ms, args->l_philos[i].num_philo);
-				while(j < args->nbr_philo)
-				{
-					args->l_philos[j].args->if_dead = 1;
-					j++;
-				}
-				return(1);
-    	    }
-			if (args->nbr_meal == args->l_philos[i].nbr_meals)
-			{
-				if (check_nbr_meals(args) == 1)
-				{
-					args->l_philos[i].time_ms = get_time() - args->start_time;
-					usleep(1000);
-					printf("%lld ms - All philosophers are full\n", args->l_philos[i].time_ms);
-					while(j < args->nbr_philo)
-					{
-						args->l_philos[j].args->if_dead = 1;
-						j++;
-					}
-					return(1);
-				}
-			}
-    	    i++;
-    	}
-		//pthread_mutex_unlock(&args->mutex_death);
-	}
-}
-
-// Test 4 310 200 100. One philosopher should die. -> bizarre...
-// Voir pour rajouter un mutex pour empecher que les philos volent des forks s'ils meurent -> voir si ok ? normalement ok. juste fork a free si pendant repas d'un autre. ./philo 4 310 200 100 un flag ?
-//-> verif si un meurt et qu'un autre a les fork -> Revoir les free/unlock des fork  car peuvent etre lock.
-//revoir fsanitize=thread ca deadline possibly lost
-//revoir pour philo nombre impair
-//revoir pour time to think si egale a zero ou moins de 10ms.

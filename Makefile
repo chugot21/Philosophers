@@ -13,8 +13,10 @@
 NAME =	philo
 
 SRCS =	philo.c \
-		ft_utils.c \
+		threads.c \
 		routine.c \
+		check_death.c \
+		ft_utils.c \
 
 CC = cc
 
