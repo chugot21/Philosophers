@@ -19,7 +19,7 @@ int	check_nbr_meals(t_args *args)
 	i = 0;
 	while (i < args->nbr_philo)
 	{
-		if (args->nbr_meal == args->l_philos[i].nbr_meals)
+		if (args->l_philos[i].nbr_meals >= args->nbr_meal)
 			i++;
 		else
 			return (0);
@@ -29,7 +29,7 @@ int	check_nbr_meals(t_args *args)
 
 int	check_death_max_meals(t_args *args, int i, int j)
 {
-	if (args->nbr_meal == args->l_philos[i].nbr_meals)
+	if (args->l_philos[i].nbr_meals == args->nbr_meal)
 	{
 		if (check_nbr_meals(args) == 1)
 		{
@@ -39,7 +39,7 @@ int	check_death_max_meals(t_args *args, int i, int j)
 				args->l_philos[j].args->if_dead = 1;
 				j++;
 			}
-			usleep(1);
+			usleep(1000);
 			printf("%lld ms - All philosophers are full\n",
 				args->l_philos[i].time_ms);
 			return (1);
@@ -69,7 +69,7 @@ int	check_death(t_args *args)
 			if (args->l_philos[i].gap_meal > args->time_to_die)
 			{
 				args->l_philos[i].time_ms = get_time() - args->start_time;
-				usleep(1);
+				usleep(1000);
 				printf("%lld ms - %d died\n", args->l_philos[i].time_ms,
 					args->l_philos[i].num_philo);
 				while (j < args->nbr_philo)
